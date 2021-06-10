@@ -29,7 +29,7 @@ module.exports = {
         const {id:_id, title} = args;
 
         try {
-            const updatedSubject = await Subject.findOneAndUpdate({_id},{title});
+            const updatedSubject = await Subject.findOneAndUpdate({_id},{title},{new:true});
 
             console.log(updatedSubject);
 

@@ -2,11 +2,22 @@ import {gql} from 'apollo-server-micro'
 
 export const typeDefs = gql`
     input StudentInput{
-        name: String
+        firstname: String
+        lastname: String
+        phone: String
+        email: String
+        dob: Float
+        subjects: [ID]
     }
 
     type Student{
-        name: String
+        id: ID
+        firstname: String
+        lastname: String
+        phone: String
+        email: String
+        dob: Float
+        subjects: [Subject]
     }
 
     type Subject{
@@ -23,7 +34,8 @@ export const typeDefs = gql`
     type Query{
         getAllSubjects: [Subject]
 
-        getStudents: [Student]
+        getAllStudents: [Student]
+        getAllStudentsBySubject(subjectId: ID): [Student]
     }
 
     type Mutation{
@@ -31,6 +43,9 @@ export const typeDefs = gql`
         updateSubject(id: ID, title: String): Subject
         deleteSubject(id: ID): msg
 
-        updateStudent(studentInput: StudentInput): Student
+        createStudent(studentInput: StudentInput): Student
+        updateStudent(id:ID,studentInput: StudentInput): Student
+        deleteStudent(id: ID): msg
+        deleteSubjectsFromStudent(studentId: ID, subjects:[ID]): Student
     }
 `
