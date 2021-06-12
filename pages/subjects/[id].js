@@ -31,7 +31,7 @@ export default function SingleSubject() {
     return (
         <>
         <div className={classes.root}>
-            <Grid
+            {/* <Grid
             container
             direction="row"
             justify="flex-end"
@@ -54,7 +54,7 @@ export default function SingleSubject() {
                 >
                     Delete
                 </Button>
-            </Grid>
+            </Grid> */}
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <SingleSubjectTable />

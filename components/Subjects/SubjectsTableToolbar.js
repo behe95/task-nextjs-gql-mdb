@@ -7,11 +7,18 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import useToolbarStyles from './useToolbarStyles';
+import TextField from '@material-ui/core/TextField';
 
+import FilterSelect from '../Select';
+
+
+const filterOptions = [
+  {value: "title", label: "Title"}
+]
 
 export default function SubjectsTableToolbar(props){
     const classes = useToolbarStyles();
-    const { numSelected, handleMultipleDelete } = props;
+    const { numSelected, handleMultipleDelete, setSearch,search, setSearchBy,searchBy } = props;
   
     return (
       <Toolbar
@@ -36,6 +43,16 @@ export default function SubjectsTableToolbar(props){
             </IconButton>
           </Tooltip>
         ) : null}
+
+
+        <TextField
+         value={search}
+         onChange={e => setSearch(e.target.value)}
+         id="standard-search" label="Search field" type="search" />
+        <FilterSelect
+        filterOptions={filterOptions} 
+        setSearchBy={setSearchBy} searchBy={searchBy} />
+
       </Toolbar>
     );
   };

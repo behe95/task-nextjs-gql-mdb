@@ -3,6 +3,12 @@ import Student from '../../models/Student';
 module.exports = {
     async createStudent(parent, {studentInput}, context, req){
         try {
+
+            const emailExists = await Student.findOne({email: studentInput.email});
+
+            if(emailExists) throw new Error('Email is already in use!');
+            
+
             const newStudent = new Student({
                 ...studentInput
             })

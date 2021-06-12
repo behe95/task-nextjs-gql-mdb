@@ -54,12 +54,11 @@ const StyledTableRow = withStyles((theme) => ({
 
 
 
-
 export default function SubjectsTable({getAllSubjectsData,getAllSubjectsLoading,getAllSubjectsError}) {
   const classes = useStyles();
 
   const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
+  const [orderBy, setOrderBy] = React.useState('title');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -72,13 +71,31 @@ export default function SubjectsTable({getAllSubjectsData,getAllSubjectsLoading,
   const [openMultipleConfirmation, setOpenMultipleConfirmation] = React.useState(false);
   
   
+  const [search,setSearch] = React.useState("");
+  const [searchBy,setSearchBy] = React.useState("title");
+
+  
+
+ 
+  
   React.useEffect(() => {
     if(!getAllSubjectsLoading && !getAllSubjectsError && getAllSubjectsData) {
       const modifiedDataArr = getAllSubjectsData?.getAllSubjects?.map(sub => createData(sub.id,sub.title));
 
       setRows(r => [...modifiedDataArr])
     }
-  },[getAllSubjectsData])
+
+    if (!getAllSubjectsLoading && !getAllSubjectsError && getAllSubjectsData && search !== "") {
+      setRows([]);
+
+      const searched_subjects = getAllSubjectsData?.getAllSubjects.filter(c => c[`${searchBy}`] && c[`${searchBy}`].toLowerCase().includes(search.toLowerCase()))
+
+      const modified_subjects = searched_subjects.map(sub => createData(sub.id,sub.title))
+
+      setRows([...modified_subjects])
+    }
+
+  },[getAllSubjectsData, search, searchBy])
 
 
   const onClickEditHandler = (info) => {
@@ -151,7 +168,12 @@ export default function SubjectsTable({getAllSubjectsData,getAllSubjectsLoading,
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <SubjectsTableToolbar handleMultipleDelete={handleMultipleDelete} numSelected={selected.length} />
+        <SubjectsTableToolbar 
+        search={search}
+        setSearch={setSearch}
+        searchBy={searchBy}
+        setSearchBy={setSearchBy} 
+        handleMultipleDelete={handleMultipleDelete} numSelected={selected.length} />
         <TableContainer>
           <Table
             className={classes.table}

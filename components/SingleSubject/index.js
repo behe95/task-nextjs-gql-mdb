@@ -72,7 +72,7 @@ export default function SingleSubjectTable() {
 
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
+  const [orderBy, setOrderBy] = React.useState('firstname');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -84,6 +84,8 @@ export default function SingleSubjectTable() {
   const [selectedForDelete, setSelectedForDelete] = React.useState(null);
   const [openConfirmation, setOpenConfirmation] = React.useState(false);
 
+  const [search,setSearch] = React.useState("");
+  const [searchBy,setSearchBy] = React.useState("firstname");
 
   React.useEffect(() => {
     if(!getAllSubjectsLoading && !getAllSubjectsError){
@@ -98,7 +100,20 @@ export default function SingleSubjectTable() {
 
       setRows(r => [...modifiedDataArr])
     }
-  },[getAllSubjectsLoading, getAllStudentsBySubjectLoading])
+
+    
+
+    if (!getAllStudentsBySubjectLoading && !getAllStudentsBySubjectError && getAllStudentsBySubjectData && search !== "") {
+      setRows([]);
+
+      const searched_students = getAllStudentsBySubjectData?.getAllStudentsBySubject.filter(c => c[`${searchBy}`] && c[`${searchBy}`].toLowerCase().includes(search.toLowerCase()))
+
+      const modified_students = searched_students.map(sub => createData(sub.id,sub.firstname,sub.lastname, sub.email, sub.phone,sub.dob,sub.subjects))
+
+      setRows([...modified_students])
+    }
+
+  },[getAllSubjectsLoading, getAllStudentsBySubjectLoading, search, searchBy])
 
 
   const onClickEditHandler = (info) => {
@@ -163,7 +178,12 @@ export default function SingleSubjectTable() {
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <SingleSubjectTableToolbar selectedSubject={selectedSubject} numSelected={selected.length} />
+        <SingleSubjectTableToolbar 
+        search={search}
+        setSearch={setSearch}
+        searchBy={searchBy}
+        setSearchBy={setSearchBy} 
+        selectedSubject={selectedSubject} numSelected={selected.length} />
         <TableContainer>
           <Table
             className={classes.table}
@@ -197,11 +217,11 @@ export default function SingleSubjectTable() {
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
-                        <Checkbox
+                        {/* <Checkbox
                           onClick={(event) => handleClick(event, row.id)}
                           checked={isItemSelected}
                           inputProps={{ 'aria-labelledby': labelId }}
-                        />
+                        /> */}
                       </TableCell>
                       <TableCell component="th" id={labelId} scope="row" padding="none">
                         {row.name}

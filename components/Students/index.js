@@ -70,6 +70,9 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
   const [openMultipleConfirmation, setOpenMultipleConfirmation] = React.useState(false);
 
 
+  const [search,setSearch] = React.useState("");
+  const [searchBy,setSearchBy] = React.useState("firstname");
+
   React.useEffect(() => {
     if(!getAllStudentsLoading && !getAllStudentsError && getAllStudentsData) {
       const modifiedDataArr = getAllStudentsData?.getAllStudents?.map(sub => createData(
@@ -78,7 +81,21 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
 
       setRows(r => [...modifiedDataArr])
     }
-  },[getAllStudentsData])
+
+    
+
+    if (!getAllStudentsLoading && !getAllStudentsError && getAllStudentsData && search !== "") {
+      setRows([]);
+
+      const searched_students = getAllStudentsData?.getAllStudents.filter(c => c[`${searchBy}`] && c[`${searchBy}`].toLowerCase().includes(search.toLowerCase()))
+
+      const modified_students = searched_students.map(sub => createData(sub.id,sub.firstname,sub.lastname, sub.email, sub.phone,sub.dob,sub.subjects))
+
+      setRows([...modified_students])
+    }
+
+
+  },[getAllStudentsData,searchBy, search])
 
   const onClickEditHandler = (info) => {
     setSelectedForEdit(sid => ({...info,subjects: info?.subjects?.map(s => s.id) }));
@@ -149,7 +166,12 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <StudentsTableToolbar handleMultipleDelete={handleMultipleDelete} numSelected={selected.length} />
+        <StudentsTableToolbar
+        search={search}
+        setSearch={setSearch}
+        searchBy={searchBy}
+        setSearchBy={setSearchBy} 
+        handleMultipleDelete={handleMultipleDelete} numSelected={selected.length} />
         <TableContainer>
           <Table
             className={classes.table}
