@@ -6,7 +6,6 @@ module.exports = {
 
         try {
             const subjects = await Subject.find();
-
             return subjects;
         } catch (error) {
             throw new Error(error.message);

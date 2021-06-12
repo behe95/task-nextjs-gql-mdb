@@ -1,4 +1,4 @@
-import {errorTypes} from '../constants/errors';
+import {errorTypes} from '../../constants/errors';
 
 const getErrorCode = errorName => {
     return errorTypes[errorName];

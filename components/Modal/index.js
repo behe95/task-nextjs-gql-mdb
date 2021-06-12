@@ -18,6 +18,7 @@ export default function _Modal({open, setOpen, children}) {
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         className={classes.modal}
+        disableBackdropClick
         open={open}
         onClose={handleClose}
         closeAfterTransition

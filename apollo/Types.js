@@ -6,7 +6,7 @@ export const typeDefs = gql`
         lastname: String
         phone: String
         email: String
-        dob: Float
+        dob: String #Float
         subjects: [ID]
     }
 
@@ -16,7 +16,7 @@ export const typeDefs = gql`
         lastname: String
         phone: String
         email: String
-        dob: Float
+        dob: String #Float
         subjects: [Subject]
     }
 
@@ -29,6 +29,11 @@ export const typeDefs = gql`
         success: Boolean,
         message: String
     }
+
+    type deleteMsg {
+        id: ID
+        msg: msg
+    }
     
 
     type Query{
@@ -39,13 +44,13 @@ export const typeDefs = gql`
     }
 
     type Mutation{
-        createSubject(title: String!): Subject
+        createSubject(title: String): Subject
         updateSubject(id: ID, title: String): Subject
-        deleteSubject(id: ID): msg
+        deleteSubject(id: ID): deleteMsg
 
         createStudent(studentInput: StudentInput): Student
         updateStudent(id:ID,studentInput: StudentInput): Student
-        deleteStudent(id: ID): msg
+        deleteStudent(id: ID): deleteMsg
         deleteSubjectsFromStudent(studentId: ID, subjects:[ID]): Student
     }
 `

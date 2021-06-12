@@ -2,7 +2,7 @@ import {ApolloServer} from 'apollo-server-micro';
 import {typeDefs} from '../../apollo/Types';
 import {resolvers} from '../../apollo/Resolver';
 import database from '../../middlewares/mongodb.middleware';
-import getErrorCode from '../../utils/getErrorCode';
+import getErrorCode from '../../utils/apollo/getErrorCode';
 
 
 const apolloServer = new ApolloServer({
@@ -17,6 +17,8 @@ const apolloServer = new ApolloServer({
                 statusCode: error.statusCode
             })            
         }
+
+        console.log(err);
 
         return err;
     }

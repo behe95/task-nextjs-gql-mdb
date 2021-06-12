@@ -19,6 +19,8 @@ module.exports = {
     },
     async updateStudent(parent, {id:_id, studentInput}, context, req){
 
+        console.log("=============================",_id,studentInput);
+
         const {subjects, ...rest} = studentInput;
         
         const updatedStudent = await Student.findOneAndUpdate(
@@ -41,8 +43,11 @@ module.exports = {
         try {
             await Student.findOneAndDelete({_id});
             return {
-                message: "Student deleted successfully",
-                success: true
+                id: _id,
+                msg: {
+                    message: "Student deleted successfully",
+                    success: true
+                }
             }
         } catch (error) {
             throw new Error(error.message);

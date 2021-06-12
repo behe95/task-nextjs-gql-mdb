@@ -7,30 +7,37 @@ import SelectInput from './SelectInput';
 
 
 
-export default function AddressForm() {
+export default function StudentForm({values, onChangeHandler}) {
+  console.log(values);
   return (
     <React.Fragment>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>
           <TextField
+            value={values?.firstname}
+            onChange={e => onChangeHandler(e)}
             required
-            id="firstName"
-            name="firstName"
+            id="firstname"
+            name="firstname"
             label="First name"
             fullWidth
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
+            value={values?.lastname}
+            onChange={e => onChangeHandler(e)}
             required
-            id="lastName"
-            name="lastName"
+            id="lastname"
+            name="lastname"
             label="Last name"
             fullWidth
           />
         </Grid>
         <Grid item xs={12}>
           <TextField
+            value={values?.email}
+            onChange={e => onChangeHandler(e)}
             required
             id="email"
             name="email"
@@ -40,6 +47,8 @@ export default function AddressForm() {
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
+            value={values?.dob}
+            onChange={e => onChangeHandler(e)}
             required
             id="dob"
             name="dob"
@@ -49,6 +58,8 @@ export default function AddressForm() {
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
+            value={values?.phone}
+            onChange={e => onChangeHandler(e)}
             required
             id="phone"
             name="phone"
@@ -57,7 +68,10 @@ export default function AddressForm() {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <SelectInput />
+          <SelectInput
+            values={values?.subjects}
+            onChangeHandler={onChangeHandler}
+          />
         </Grid>
       </Grid>
     </React.Fragment>

@@ -6,6 +6,8 @@ module.exports = {
     async createSubject(parent, args, context, req){
         const {title} = args;
 
+        console.log(args);
+
         try {
             
             const subjectExist = await Subject.findOne({title});
@@ -21,12 +23,15 @@ module.exports = {
             return newSubject;
 
         } catch (error) {
+            console.log(error);
             throw new Error(error.message)
         }        
     },
 
     async updateSubject(parent, args, context, req){
         const {id:_id, title} = args;
+        
+        console.log("MUTATION UPDATE^^^^^=====================", args);
 
         try {
             const updatedSubject = await Subject.findOneAndUpdate({_id},{title},{new:true});
@@ -46,8 +51,11 @@ module.exports = {
             await Subject.findOneAndDelete({_id});
 
             return {
-                message: "Subject deleted successfully",
-                success: true
+                id: _id,
+                msg: {
+                    message: "Subject deleted successfully",
+                    success: true
+                }
             }
         } catch (error) {
             throw new Error(error.message);

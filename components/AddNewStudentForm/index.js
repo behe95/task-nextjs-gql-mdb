@@ -11,12 +11,46 @@ import Typography from '@material-ui/core/Typography';
 import useStyles from './useStyles';
 import Form from './Form';
 
+import { useSnackbar } from 'notistack';
+import useSubmitForm from './hooks/useSubmitForm';
+import useForm from './hooks/useForm';
+import useEditForm from './hooks/useEditForm';
 
+const initValues = {
+  firstname: "",
+  lastname: "",
+  email: "",
+  phone: "",
+  dob: "",
+  subjects: []
+}
 
-export default function AddNewStudentForm({open, setOpen}) {
+export default function AddNewStudentForm({open, setOpen, ...rest}) {
+  const {selectedForEdit, setSelectedForEdit} = rest || {};
+
   const classes = useStyles();
+  
+  const [createStudent,loading, serverResponseData] = useSubmitForm();
+  const [updateStudent, updateStudentLoading, updateStudentServerResponseData] = useEditForm();
+  console.log(selectedForEdit);
+  const [values, onChangeHandler] = useForm(
+    selectedForEdit ? {...initValues, ...selectedForEdit} : initValues
+  );
 
-  const handleAdd = () => {
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleAdd = async () => {
+    try {
+      if (selectedForEdit) {
+        await updateStudent(values)
+        enqueueSnackbar('Student edited successfully', {variant: 'success'})        
+      }else{
+        await createStudent(values)
+        enqueueSnackbar('Student added successfully', {variant: 'success'})
+      }
+    } catch (error) {
+      enqueueSnackbar(error.message, {variant: 'error'})
+    }
   };
 
   return (
@@ -28,7 +62,10 @@ export default function AddNewStudentForm({open, setOpen}) {
             Student Information
           </Typography>
           <React.Fragment>
-            <Form />
+            <Form
+              values={values}
+              onChangeHandler={onChangeHandler}            
+            />
             <div className={classes.buttons}>
                 <Button
                 onClick={() => setOpen(!open)}

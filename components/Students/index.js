@@ -12,27 +12,24 @@ import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import useStyles from './useStyles';
+import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import StudentsTableHead from './StudentsTableHead';
 import StudentsTableToolbar from './StudentsTableToolbar';
+import SubjectMenu from './SubjectMenu'
 
 import {getComparator,stableSort} from '../../utils/components/table';
+import _Modal from '../Modal';
+import AddNewStudentForm from '../AddNewStudentForm';
+import ConfirmationForm from '../ConfirmationForm'
 
-function createData(name, email, phone, dob, subjects) {
-  return { name, email, phone, dob, subjects };
+function createData(id, firstname, lastname, email, phone, dob, subjects) {
+  let name = firstname + " " + lastname;
+  return { id, name, firstname, lastname, email, phone, dob, subjects };
 }
 
-const rows = [
-  createData('John Doe1', "johndoe@gmail.com", "012124124", "12-12-12", "Bengali, English, Bengali, English"),
-  createData('John Doe2', "johndoe@gmail.com", "012124124", "12-12-12", "Bengali, English"),
-  createData('John Doe3', "johndoe@gmail.com", "012124124", "12-12-12", "Bengali, English"),
-  createData('John Doe4', "johndoe@gmail.com", "012124124", "12-12-12", "Bengali, English"),
-  createData('John Doe5', "johndoe@gmail.com", "012124124", "12-12-12", "Bengali, English"),
-  createData('John Doe6', "johndoe@gmail.com", "012124124", "12-12-12", "Bengali, English"),
-  createData('John Doe7', "johndoe@gmail.com", "012124124", "12-12-12", "Bengali, English"),
-  createData('John Doe8', "johndoe@gmail.com", "012124124", "12-12-12", "Bengali, English"),
-  createData('John Doe9', "johndoe@gmail.com", "012124124", "12-12-12", "Bengali, English"),
-];
 
 
 
@@ -54,13 +51,42 @@ const StyledTableRow = withStyles((theme) => ({
 
 
 
-export default function StudentsTable() {
+export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,getAllStudentsError}) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('email');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rows, setRows] = React.useState([]);
+
+  const [open, setOpen] = React.useState(false);
+  const [selectedForEdit, setSelectedForEdit] = React.useState(null);
+  const [selectedForDelete, setSelectedForDelete] = React.useState(null);
+  const [openConfirmation, setOpenConfirmation] = React.useState(false);
+
+
+  React.useEffect(() => {
+    if(!getAllStudentsLoading && !getAllStudentsError && getAllStudentsData) {
+      const modifiedDataArr = getAllStudentsData?.getAllStudents?.map(sub => createData(
+        sub.id,sub.firstname,sub.lastname, sub.email, sub.phone,sub.dob,sub.subjects
+      ));
+
+      setRows(r => [...modifiedDataArr])
+    }
+  },[getAllStudentsData])
+
+  const onClickEditHandler = (info) => {
+    console.log("EDIT ============== ", info);
+    setSelectedForEdit(sid => ({...info,subjects: info?.subjects?.map(s => s.id) }));
+    setOpen(true);
+  }
+
+  const onClickDeleteHandler = (info) => {
+    console.log("Delete ============== ", info);
+    setSelectedForDelete(i => ({...info, __typename: 'Student'}));
+    setOpenConfirmation(true);
+  }
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -106,8 +132,14 @@ export default function StudentsTable() {
     setPage(0);
   };
 
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
@@ -138,7 +170,7 @@ export default function StudentsTable() {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
+                  const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
@@ -147,12 +179,12 @@ export default function StudentsTable() {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
+                      key={row.id}
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
                         <Checkbox
-                          onClick={(event) => handleClick(event, row.name)}
+                          onClick={(event) => handleClick(event, row.id)}
                           checked={isItemSelected}
                           inputProps={{ 'aria-labelledby': labelId }}
                         />
@@ -163,12 +195,20 @@ export default function StudentsTable() {
                       <TableCell align="right">{row.email}</TableCell>
                       <TableCell align="right">{row.phone}</TableCell>
                       <TableCell align="right">{row.dob}</TableCell>
-                      <TableCell align="right">{row.subjects}</TableCell>
                       <TableCell align="right">
-                        <IconButton color="primary" component="span">
+                          {
+                            row.subjects.length > 0 ? <SubjectMenu subjects={row.subjects} /> : null
+                          }
+                      </TableCell>
+                      <TableCell align="right">
+                        <IconButton
+                        onClick={() => onClickEditHandler(row)} 
+                        color="primary" component="span">
                           <EditIcon />
                         </IconButton>
-                        <IconButton color="secondary" component="span">
+                        <IconButton
+                        onClick={() => onClickDeleteHandler(row)} 
+                        color="secondary" component="span">
                           <DeleteIcon />
                         </IconButton>
                         
@@ -194,6 +234,29 @@ export default function StudentsTable() {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
+
+      <_Modal
+        open={open}
+        setOpen={setOpen}
+      >
+        <AddNewStudentForm
+          open={open}
+          setOpen={setOpen}
+          selectedForEdit={selectedForEdit}
+          setSelected={setSelectedForEdit}
+        />
+      </_Modal>
+
+      <_Modal
+        open={openConfirmation}
+        setOpen={setOpenConfirmation}
+      >
+        <ConfirmationForm
+          open={openConfirmation}
+          setOpen={setOpenConfirmation}
+          selectedForDelete={selectedForDelete}
+        />
+      </_Modal>
     </div>
   );
 }

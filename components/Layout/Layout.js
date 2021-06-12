@@ -16,14 +16,10 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
 import PeopleIcon from '@material-ui/icons/People';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
-import SubjectIcon from '@material-ui/icons/Subject';
-import MenuBookIcon from '@material-ui/icons/MenuBook';
 import useStyles from './styles';
+
 
 
 
@@ -32,6 +28,7 @@ export default function PersistentDrawerLeft({children}) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [collapse, setCollapse] = React.useState(false);
+
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -88,38 +85,16 @@ export default function PersistentDrawerLeft({children}) {
         <List>
             <Link href="/">
                 <ListItem button>
+                <ListItemIcon><LibraryBooksIcon /></ListItemIcon>
+                <ListItemText primary="Subjects" />
+                </ListItem>
+            </Link>
+            <Link href="/students">
+                <ListItem button>
                 <ListItemIcon><PeopleIcon /></ListItemIcon>
                 <ListItemText primary="Students" />
                 </ListItem>
             </Link>
-
-            <ListItem button onClick={handleClick}>
-                <ListItemIcon>
-                <LibraryBooksIcon />
-                </ListItemIcon>
-                <ListItemText primary="Subjects" />
-                {collapse ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
-            <Collapse in={collapse} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                <Link href="/subjects">
-                    <ListItem button className={classes.nested}>
-                        <ListItemIcon>
-                        <SubjectIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="All" />
-                    </ListItem>                
-                </Link>
-                <Link href="/subjects/bengali">
-                    <ListItem button className={classes.nested}>
-                        <ListItemIcon>
-                        <MenuBookIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Bengali" />
-                    </ListItem>                
-                </Link>
-                </List>
-            </Collapse>
 
         </List>
       </Drawer>

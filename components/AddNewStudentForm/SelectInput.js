@@ -10,6 +10,9 @@ import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
 
+import {useQuery} from '@apollo/client';
+import {GET_ALL_SUBJECTS} from '../../apolloClient/queries/subjects';
+
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
@@ -54,25 +57,20 @@ function getStyles(name, personName, theme) {
   };
 }
 
-export default function MultipleSelect() {
+export default function MultipleSelect({onChangeHandler, values}) {
   const classes = useStyles();
   const theme = useTheme();
   const [personName, setPersonName] = React.useState([]);
+
+  const { loading:getAllSubjectsLoading, error:getAllSubjectsError, data:getAllSubjectsData } = useQuery(GET_ALL_SUBJECTS, {
+    fetchPolicy: "cache-first"
+  });
 
   const handleChange = (event) => {
     setPersonName(event.target.value);
   };
 
-  const handleChangeMultiple = (event) => {
-    const { options } = event.target;
-    const value = [];
-    for (let i = 0, l = options.length; i < l; i += 1) {
-      if (options[i].selected) {
-        value.push(options[i].value);
-      }
-    }
-    setPersonName(value);
-  };
+  console.log(personName);
 
   return (
     <div>
@@ -81,17 +79,18 @@ export default function MultipleSelect() {
         <Select
           labelId="demo-mutiple-checkbox-label"
           id="demo-mutiple-checkbox"
+          name="subjects"
           multiple
-          value={personName}
-          onChange={handleChange}
+          value={values}
+          onChange={onChangeHandler}
           input={<Input />}
           renderValue={(selected) => selected.join(', ')}
           MenuProps={MenuProps}
         >
-          {subjects.map((name) => (
-            <MenuItem key={name} value={name}>
-              <Checkbox checked={personName.indexOf(name) > -1} />
-              <ListItemText primary={name} />
+          {!getAllSubjectsLoading && !getAllSubjectsError && getAllSubjectsData?.getAllSubjects.map(subject => (
+            <MenuItem key={subject.id} value={subject.id}>
+              <Checkbox checked={values.indexOf(subject.id) > -1} />
+              <ListItemText primary={subject.title} />
             </MenuItem>
           ))}
         </Select>
