@@ -8,12 +8,10 @@ export default function useSubmitForm() {
 
     const [_createSubject, {loading}] = useMutation(CREATE_SUBJECT, {
         update: (cache, {data}) => {
-            console.log(cache);
             const storedSubjects = cache.readQuery({
                 query: GET_ALL_SUBJECTS
             })
             
-            console.log(storedSubjects);
             cache.writeQuery({
                 query: GET_ALL_SUBJECTS,
                 data: {

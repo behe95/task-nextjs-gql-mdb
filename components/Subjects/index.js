@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,6 +12,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 
 import useStyles from './useStyles';
 
@@ -21,6 +23,7 @@ import {getComparator,stableSort} from '../../utils/components/table';
 import _Modal from '../Modal';
 import AddNewSubjectForm from '../AddNewSubject';
 import ConfirmationForm from '../ConfirmationForm'
+import ConfirmationMultipleDelete from '../ConfirmationMultipleDelete';
 
 function createData(id,name) {
   return { id,name };
@@ -54,6 +57,7 @@ const StyledTableRow = withStyles((theme) => ({
 
 export default function SubjectsTable({getAllSubjectsData,getAllSubjectsLoading,getAllSubjectsError}) {
   const classes = useStyles();
+
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
@@ -65,6 +69,7 @@ export default function SubjectsTable({getAllSubjectsData,getAllSubjectsLoading,
   const [selectedForEdit, setSelectedForEdit] = React.useState(null);
   const [selectedForDelete, setSelectedForDelete] = React.useState(null);
   const [openConfirmation, setOpenConfirmation] = React.useState(false);
+  const [openMultipleConfirmation, setOpenMultipleConfirmation] = React.useState(false);
   
   
   React.useEffect(() => {
@@ -75,19 +80,23 @@ export default function SubjectsTable({getAllSubjectsData,getAllSubjectsLoading,
     }
   },[getAllSubjectsData])
 
+
   const onClickEditHandler = (info) => {
-    console.log("EDIT ============== ", info);
     setSelectedForEdit(sid => info);
     setOpen(true);
   }
 
   const onClickDeleteHandler = (info) => {
-    console.log("Delete ============== ", info);
     setSelectedForDelete(i => ({...info, __typename: 'Subject'}));
     setOpenConfirmation(true);
   }
 
-  console.log("REDNER SUBJECT============");
+
+  const handleMultipleDelete = () => {
+    setSelectedForDelete(i => ({__typename: "MultipleSubjects", id: selected}))
+    setOpenMultipleConfirmation(true);
+  }
+
 
 
   const handleRequestSort = (event, property) => {
@@ -142,7 +151,7 @@ export default function SubjectsTable({getAllSubjectsData,getAllSubjectsLoading,
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <SubjectsTableToolbar numSelected={selected.length} />
+        <SubjectsTableToolbar handleMultipleDelete={handleMultipleDelete} numSelected={selected.length} />
         <TableContainer>
           <Table
             className={classes.table}
@@ -186,6 +195,14 @@ export default function SubjectsTable({getAllSubjectsData,getAllSubjectsLoading,
                         {row.name}
                       </TableCell>
                       <TableCell align="right">
+
+                        <Link href={`subjects/${row.id}`}>
+                          <IconButton
+                          color="primary" component="span">
+                            <VisibilityIcon />
+                          </IconButton>
+
+                        </Link>
                         <IconButton
                           onClick={() => onClickEditHandler(row)}
                         color="primary" component="span">
@@ -240,6 +257,18 @@ export default function SubjectsTable({getAllSubjectsData,getAllSubjectsLoading,
           open={openConfirmation}
           setOpen={setOpenConfirmation}
           selectedForDelete={selectedForDelete}
+        />
+      </_Modal>
+
+      <_Modal
+        open={openMultipleConfirmation}
+        setOpen={setOpenMultipleConfirmation}
+      >
+        <ConfirmationMultipleDelete
+          open={openMultipleConfirmation}
+          setOpen={setOpenMultipleConfirmation}
+          selectedForDelete={selectedForDelete}
+          setSelected={setSelected}
         />
       </_Modal>
     </div>

@@ -70,7 +70,6 @@ export default function MultipleSelect({onChangeHandler, values}) {
     setPersonName(event.target.value);
   };
 
-  console.log(personName);
 
   return (
     <div>

@@ -26,7 +26,7 @@ import useStyles from './styles';
 export default function PersistentDrawerLeft({children}) {
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   const [collapse, setCollapse] = React.useState(false);
 
 

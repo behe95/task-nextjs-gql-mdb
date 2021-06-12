@@ -8,6 +8,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import Modal from '../../components/Modal';
 import AddNewSubject from '../../components/AddNewSubject';
 
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,

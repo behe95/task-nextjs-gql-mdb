@@ -32,7 +32,6 @@ export default function AddNewStudentForm({open, setOpen, ...rest}) {
   
   const [createStudent,loading, serverResponseData] = useSubmitForm();
   const [updateStudent, updateStudentLoading, updateStudentServerResponseData] = useEditForm();
-  console.log(selectedForEdit);
   const [values, onChangeHandler] = useForm(
     selectedForEdit ? {...initValues, ...selectedForEdit} : initValues
   );

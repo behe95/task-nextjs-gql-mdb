@@ -24,6 +24,9 @@ import {getComparator,stableSort} from '../../utils/components/table';
 import _Modal from '../Modal';
 import AddNewStudentForm from '../AddNewStudentForm';
 import ConfirmationForm from '../ConfirmationForm'
+import ConfirmationMultipleDelete from '../ConfirmationMultipleDelete'
+
+import {convertMilliToDate} from '../../utils/misc/moment';
 
 function createData(id, firstname, lastname, email, phone, dob, subjects) {
   let name = firstname + " " + lastname;
@@ -64,6 +67,7 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
   const [selectedForEdit, setSelectedForEdit] = React.useState(null);
   const [selectedForDelete, setSelectedForDelete] = React.useState(null);
   const [openConfirmation, setOpenConfirmation] = React.useState(false);
+  const [openMultipleConfirmation, setOpenMultipleConfirmation] = React.useState(false);
 
 
   React.useEffect(() => {
@@ -77,15 +81,19 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
   },[getAllStudentsData])
 
   const onClickEditHandler = (info) => {
-    console.log("EDIT ============== ", info);
     setSelectedForEdit(sid => ({...info,subjects: info?.subjects?.map(s => s.id) }));
     setOpen(true);
   }
 
   const onClickDeleteHandler = (info) => {
-    console.log("Delete ============== ", info);
     setSelectedForDelete(i => ({...info, __typename: 'Student'}));
     setOpenConfirmation(true);
+  }
+
+
+  const handleMultipleDelete = () => {
+    setSelectedForDelete(i => ({__typename: "MultipleStudents", id: selected}))
+    setOpenMultipleConfirmation(true);
   }
 
   const handleRequestSort = (event, property) => {
@@ -96,7 +104,7 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n.name);
+      const newSelecteds = rows.map((n) => n.id);
       setSelected(newSelecteds);
       return;
     }
@@ -132,15 +140,7 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
     setPage(0);
   };
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
@@ -149,7 +149,7 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <StudentsTableToolbar numSelected={selected.length} />
+        <StudentsTableToolbar handleMultipleDelete={handleMultipleDelete} numSelected={selected.length} />
         <TableContainer>
           <Table
             className={classes.table}
@@ -172,6 +172,8 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
+                  
+                  console.log(isItemSelected);
 
                   return (
                     <StyledTableRow
@@ -194,10 +196,10 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
                       </TableCell>
                       <TableCell align="right">{row.email}</TableCell>
                       <TableCell align="right">{row.phone}</TableCell>
-                      <TableCell align="right">{row.dob}</TableCell>
+                      <TableCell align="right">{convertMilliToDate(row.dob)}</TableCell>
                       <TableCell align="right">
                           {
-                            row.subjects.length > 0 ? <SubjectMenu subjects={row.subjects} /> : null
+                            row.subjects.length > 0 ? <SubjectMenu student={row} subjects={row.subjects} /> : null
                           }
                       </TableCell>
                       <TableCell align="right">
@@ -255,6 +257,18 @@ export default function StudentsTable({getAllStudentsData,getAllStudentsLoading,
           open={openConfirmation}
           setOpen={setOpenConfirmation}
           selectedForDelete={selectedForDelete}
+        />
+      </_Modal>
+
+      <_Modal
+        open={openMultipleConfirmation}
+        setOpen={setOpenMultipleConfirmation}
+      >
+        <ConfirmationMultipleDelete
+          open={openMultipleConfirmation}
+          setOpen={setOpenMultipleConfirmation}
+          selectedForDelete={selectedForDelete}
+          setSelected={setSelected}
         />
       </_Modal>
     </div>

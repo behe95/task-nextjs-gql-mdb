@@ -6,9 +6,9 @@ export default function useEditForm() {
 
     const [response, setResponse] = React.useState(null)
 
-    const [_updateSubject, {loading}] = useMutation(EDIT_STUDENT);
+    const [_updateStudent, {loading}] = useMutation(EDIT_STUDENT);
 
-    const updateSubject = async (selectedForEdit) => {
+    const updateStudent = async (selectedForEdit) => {
         const {id,name, ...rest} = selectedForEdit;
 
         for (let key in rest) {
@@ -18,7 +18,7 @@ export default function useEditForm() {
         }
 
         try {
-            const {data} = await _updateSubject({variables: {id,studentInput:{...rest}}});
+            const {data} = await _updateStudent({variables: {id,studentInput:{...rest}}});
     
             setResponse(res => data);
             
@@ -28,5 +28,5 @@ export default function useEditForm() {
         
     }
 
-    return [updateSubject, loading, response];
+    return [updateStudent, loading, response];
 }

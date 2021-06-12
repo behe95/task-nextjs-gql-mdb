@@ -2,7 +2,6 @@ import Student from '../../models/Student';
 
 module.exports = {
     async createStudent(parent, {studentInput}, context, req){
-        console.log('Create student mutation =============== ', studentInput);
         try {
             const newStudent = new Student({
                 ...studentInput
@@ -19,7 +18,6 @@ module.exports = {
     },
     async updateStudent(parent, {id:_id, studentInput}, context, req){
 
-        console.log("=============================",_id,studentInput);
 
         const {subjects, ...rest} = studentInput;
         
@@ -58,8 +56,9 @@ module.exports = {
         try {
             const updatedStudent = await Student.findOneAndUpdate(
                 {_id},
-                {"$pull":{"subjects":{$in:[...subjects]}}}
-            )
+                {"$pull":{"subjects":{$in:[...subjects]}}},
+                {new: true}
+            ).populate("subjects").exec()
 
             return updatedStudent;
 
@@ -68,6 +67,28 @@ module.exports = {
             throw new Error(error.message);
         }
 
-        return {}
+    },
+
+    async deleteMultipleStudent(parent, args, context, req){
+        const {id:idList} = args;
+
+
+        try {
+            
+            await Student.remove({
+                _id: {$in: [...idList]}
+            });
+    
+            return {
+                id: idList,
+                msg: {
+                    message: "Selected subjects deleted successfully",
+                    success: true
+                }
+            }
+        } catch (error) {
+            throw new Error(error.message)
+        }
+
     }
 }

@@ -6,29 +6,26 @@ import Typography from '@material-ui/core/Typography';
 import useStyles from './useStyles';
 import Spinner from '../Spinner';
 
-import useDeleteSubject from './hooks/useDeleteSubject';
-import useDeleteStudent from './hooks/useDeleteStudent';
-import useDeleteSubjectFromStudent from './hooks/useDeleteSubjectFromStudent';
+import useMultipleSubjectsDelete from './hooks/useMultipleSubjectsDelete';
+import useMultipleStudentsDelete from './hooks/useMultipleStudentsDelete';
 
 
 import { useSnackbar } from 'notistack';
 
 const TYPES = {
-    SUBJECT: 'Subject',
-    STUDENT: 'Student',
-    SUBJECT_FROM_STUDENT: "SubjectFromStudent"
+    MULTI_SUBJECTS: 'MultipleSubjects',
+    MULTI_STUDENTS: 'MultipleStudents',
 }
 
 
 export default function ConfirmationForm({open, setOpen, ...rest}) {
 
-    const {selectedForDelete} = rest;
+    const {selectedForDelete,setSelected} = rest;
   const classes = useStyles();
 
 
-  const [deleteSubject,deleteSubjectLoading] = useDeleteSubject();
-  const [deleteStudent,deleteStudentLoading] = useDeleteStudent();
-  const [deleteSubjectFromStudent, deleteSubjectFromStudentLoading] = useDeleteSubjectFromStudent();
+  const [deleteMultipleSubject,deleteMultipleSubjectLoading] = useMultipleSubjectsDelete();
+  const [deleteMultipleStudent,deleteMultipleStudentLoading] = useMultipleStudentsDelete();
   
   const isMounted = React.useRef(true);
   
@@ -42,12 +39,10 @@ export default function ConfirmationForm({open, setOpen, ...rest}) {
 
   const getRoleOfThisFunction = (obj) => {
       switch (obj.__typename) {
-        case TYPES.SUBJECT:
+        case TYPES.MULTI_SUBJECTS:
             return obj.__typename;
-        case TYPES.STUDENT:
-            return obj.__typename;
-        case TYPES.SUBJECT_FROM_STUDENT:
-            return obj.__typename;            
+        case TYPES.MULTI_STUDENTS:
+            return obj.__typename;          
       }
   }
   
@@ -58,11 +53,11 @@ export default function ConfirmationForm({open, setOpen, ...rest}) {
 
       if(isMounted.current){
         
-        if(typeName === TYPES.SUBJECT) await deleteSubject(selectedForDelete.id);
-        if(typeName === TYPES.STUDENT) await deleteStudent(selectedForDelete.id);
-        if(typeName === TYPES.SUBJECT_FROM_STUDENT) await deleteSubjectFromStudent(selectedForDelete);
+        if(typeName === TYPES.MULTI_SUBJECTS) await deleteMultipleSubject(selectedForDelete.id);
+        if(typeName === TYPES.MULTI_STUDENTS) await deleteMultipleStudent(selectedForDelete.id);
 
-        enqueueSnackbar(`${selectedForDelete.name} is deleted successfully`, {variant: 'success'})
+        enqueueSnackbar(`${selectedForDelete.id.length} items are deleted successfully`, {variant: 'success'})
+        setSelected([]);
         setOpen(false);
       }
     } catch (error) {
@@ -77,17 +72,13 @@ export default function ConfirmationForm({open, setOpen, ...rest}) {
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
-            {
-              getRoleOfThisFunction(selectedForDelete) === TYPES.SUBJECT_FROM_STUDENT ?
-                  `Are you sure you want to remove ${selectedForDelete?.selectedSubject?.title} from ${selectedForDelete.name}` :
-                  `Are you sure you want to delete ${selectedForDelete.name}`
-            }
+            {`Are you sure you want to remove ${selectedForDelete.id.length} items?`}
           </Typography>
           <React.Fragment>
 
             <div className={classes.buttons}>
                 <Button
-                disabled={deleteSubjectLoading || deleteStudentLoading || deleteSubjectFromStudentLoading}
+                disabled={deleteMultipleSubjectLoading}
                 onClick={() => setOpen(!open)}
                 variant="contained"
                 className={classes.button}
@@ -95,7 +86,7 @@ export default function ConfirmationForm({open, setOpen, ...rest}) {
                 Cancel
                 </Button>
                 <Button
-                disabled={deleteSubjectLoading || deleteStudentLoading || deleteSubjectFromStudentLoading}
+                disabled={deleteMultipleSubjectLoading}
                 variant="contained"
                 color="secondary"
                 onClick={handleDelete}

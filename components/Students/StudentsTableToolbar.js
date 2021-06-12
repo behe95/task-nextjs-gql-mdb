@@ -11,7 +11,7 @@ import useToolbarStyles from './useToolbarStyles';
 
 export default function StudentsTableToolbar(props){
     const classes = useToolbarStyles();
-    const { numSelected } = props;
+    const { numSelected,handleMultipleDelete } = props;
   
     return (
       <Toolbar
@@ -31,7 +31,7 @@ export default function StudentsTableToolbar(props){
   
         {numSelected > 0 ? (
           <Tooltip title="Delete">
-            <IconButton aria-label="delete">
+            <IconButton onClick={handleMultipleDelete} aria-label="delete">
               <DeleteIcon />
             </IconButton>
           </Tooltip>

@@ -34,6 +34,12 @@ export const typeDefs = gql`
         id: ID
         msg: msg
     }
+
+    type deleteMultipleMsg {
+        id: [ID]
+        msg: msg
+    }
+    
     
 
     type Query{
@@ -47,10 +53,12 @@ export const typeDefs = gql`
         createSubject(title: String): Subject
         updateSubject(id: ID, title: String): Subject
         deleteSubject(id: ID): deleteMsg
+        deleteMultipleSubject(id: [ID]): deleteMultipleMsg
 
         createStudent(studentInput: StudentInput): Student
         updateStudent(id:ID,studentInput: StudentInput): Student
         deleteStudent(id: ID): deleteMsg
         deleteSubjectsFromStudent(studentId: ID, subjects:[ID]): Student
+        deleteMultipleStudent(id: [ID]): deleteMultipleMsg
     }
 `

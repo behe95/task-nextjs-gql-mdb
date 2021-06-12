@@ -55,20 +55,47 @@ export const DELETE_STUDENT = gql`
 `
 
 export const DELETE_SUBJECT_FROM_STUDENT = gql`
-  mutation DeleteSubjectFromStudent($studentId: ID, $subjects:[ID]){
-      deleteSubjectFromStudent(studentId: $studentId, subjects: $subjects){
-          id
-          subjects{
-              id
-          }
+  mutation DeleteSubjectsFromStudent($studentId: ID, $subjects:[ID]){
+    deleteSubjectsFromStudent(studentId: $studentId, subjects: $subjects){
+      id
+      firstname
+      lastname
+      email
+      phone
+      dob
+      subjects{
+        id
+        title
       }
+    }
   }
 `
 
 export const GET_ALL_STUDENTS_BY_SUBJECT = gql`
   query GetAllStudentsBySubject($subjectId: ID){
     getAllStudentsBySubject(subjectId: $subjectId){
+      id
+      firstname
+      lastname
+      email
+      phone
+      dob
+      subjects{
         id
+        title
+      }
     }
   }
 `
+
+export const DELETE_MULTIPLE_STUDENTS = gql`
+  mutation DeleteMultipleStudent($id: [ID]) {
+    deleteMultipleStudent(id: $id) {
+      id
+      msg {
+        success
+        message
+      }
+    }
+  }
+` 

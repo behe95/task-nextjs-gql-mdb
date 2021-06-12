@@ -38,3 +38,15 @@ export const DELETE_SUBJECT = gql`
     }
   }
 `
+
+export const DELETE_MULTIPLE_SUBJECTS = gql`
+  mutation DeleteMultipleSubject($id: [ID]) {
+    deleteMultipleSubject(id: $id) {
+      id
+      msg {
+        success
+        message
+      }
+    }
+  }
+` 

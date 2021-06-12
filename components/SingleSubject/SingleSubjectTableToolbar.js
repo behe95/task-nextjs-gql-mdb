@@ -11,7 +11,7 @@ import useToolbarStyles from './useToolbarStyles';
 
 export default function SingleSubjectTableToolbar(props){
     const classes = useToolbarStyles();
-    const { numSelected } = props;
+    const { numSelected, selectedSubject } = props;
   
     return (
       <Toolbar
@@ -25,7 +25,7 @@ export default function SingleSubjectTableToolbar(props){
           </Typography>
         ) : (
           <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
-            Single Subject
+            {selectedSubject && selectedSubject.title}
           </Typography>
         )}
   

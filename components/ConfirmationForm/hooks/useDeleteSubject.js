@@ -8,12 +8,10 @@ export default function useDeleteSubject() {
 
     const [_deleteSubject, {loading}] = useMutation(DELETE_SUBJECT, {
         update: (cache, {data}) => {
-            console.log(cache);
             const storedSubjects = cache.readQuery({
                 query: GET_ALL_SUBJECTS
             })
             
-            console.log(storedSubjects);
             cache.writeQuery({
                 query: GET_ALL_SUBJECTS,
                 data: {

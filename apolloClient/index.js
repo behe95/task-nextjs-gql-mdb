@@ -33,8 +33,6 @@ function createApolloClinet() {
 
 export function initializeApollo(initialState = null) {
   const _apolloClient = apolloClient ?? createApolloClinet();
-  console.log("_apolloCLIENT ============================== ",_apolloClient);
-  console.log("apolloCLIENT ============================== ",apolloClient);
 
   if(initialState){
     const existingCache = _apolloClient.extract();

@@ -8,12 +8,10 @@ export default function useDeleteStudent() {
 
     const [_deleteStudent, {loading}] = useMutation(DELETE_STUDENT, {
         update: (cache, {data}) => {
-            console.log(cache);
             const storedStudents = cache.readQuery({
                 query: GET_ALL_STUDENTS
             })
             
-            console.log(storedStudents);
             cache.writeQuery({
                 query: GET_ALL_STUDENTS,
                 data: {

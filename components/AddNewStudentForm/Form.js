@@ -1,14 +1,11 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import DatePicker from './DatePicker';
 import SelectInput from './SelectInput';
 
 
-
 export default function StudentForm({values, onChangeHandler}) {
-  console.log(values);
   return (
     <React.Fragment>
       <Grid container spacing={3}>
@@ -46,13 +43,9 @@ export default function StudentForm({values, onChangeHandler}) {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <TextField
+          <DatePicker
             value={values?.dob}
-            onChange={e => onChangeHandler(e)}
-            required
-            id="dob"
-            name="dob"
-            label="Date of Birth"
+            onChangeHandler={onChangeHandler}
             fullWidth
           />
         </Grid>
@@ -61,6 +54,7 @@ export default function StudentForm({values, onChangeHandler}) {
             value={values?.phone}
             onChange={e => onChangeHandler(e)}
             required
+            type="number"
             id="phone"
             name="phone"
             label="Phone"

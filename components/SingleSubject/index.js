@@ -1,4 +1,5 @@
 import React from 'react';
+import {useRouter} from 'next/router';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -18,27 +19,19 @@ import SingleSubjectTableHead from './SingleSubjectTableHead';
 import SingleSubjectTableToolbar from './SingleSubjectTableToolbar';
 
 import {getComparator,stableSort} from '../../utils/components/table';
+import _Modal from '../Modal';
+import AddNewStudentForm from '../AddNewStudentForm';
+import ConfirmationForm from '../ConfirmationForm'
 
-function createData(name) {
-  return { name };
+import {useQuery} from '@apollo/client';
+import {GET_ALL_STUDENTS_BY_SUBJECT} from '../../apolloClient/queries/students';
+import {GET_ALL_SUBJECTS} from '../../apolloClient/queries/subjects';
+
+
+function createData(id, firstname, lastname, email, phone, dob, subjects) {
+  let name = firstname + " " + lastname;
+  return { id, name, firstname, lastname, email, phone, dob, subjects };
 }
-
-const rows = [
-  createData('John Doe1'),
-  createData('John Doe2'),
-  createData('John Doe3'),
-  createData('John Doe4'),
-  createData('John Doe5'),
-  createData('John Doe6'),
-  createData('John Doe7'),
-  createData('John Doe8'),
-  createData('John Doe9'),
-];
-
-
-
-
-
 
 
 const StyledTableRow = withStyles((theme) => ({
@@ -52,23 +45,78 @@ const StyledTableRow = withStyles((theme) => ({
 
 
 
-
-
-
 export default function SingleSubjectTable() {
+  const router = useRouter();
+  const {id} = router.query;
+
+  const {
+    data: getAllSubjectsData,
+    loading: getAllSubjectsLoading,
+    error: getAllSubjectsError
+  } = useQuery(GET_ALL_SUBJECTS, {
+    fetchPolicy: 'cache-and-network'
+  });
+
+
+  const {
+    data: getAllStudentsBySubjectData,
+    loading: getAllStudentsBySubjectLoading,
+    error: getAllStudentsBySubjectError
+  } = useQuery(GET_ALL_STUDENTS_BY_SUBJECT,{
+    variables: {subjectId:id},
+    fetchPolicy: 'cache-and-network'
+  });
+
+  
+  
+
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rows, setRows] = React.useState([]);
+
+  const [selectedSubject, setSelectedSubject] = React.useState(null);
+  const [open, setOpen] = React.useState(false);
+  const [selectedForEdit, setSelectedForEdit] = React.useState(null);
+  const [selectedForDelete, setSelectedForDelete] = React.useState(null);
+  const [openConfirmation, setOpenConfirmation] = React.useState(false);
+
+
+  React.useEffect(() => {
+    if(!getAllSubjectsLoading && !getAllSubjectsError){
+      const subject = getAllSubjectsData?.getAllSubjects.filter(s => s.id === id);
+      setSelectedSubject(subject[0]);
+    }
+
+    if(!getAllStudentsBySubjectLoading && !getAllStudentsBySubjectError && getAllStudentsBySubjectData) {
+      const modifiedDataArr = getAllStudentsBySubjectData?.getAllStudentsBySubject?.map(sub => createData(
+        sub.id,sub.firstname,sub.lastname, sub.email, sub.phone,sub.dob,sub.subjects
+      ));
+
+      setRows(r => [...modifiedDataArr])
+    }
+  },[getAllSubjectsLoading, getAllStudentsBySubjectLoading])
+
+
+  const onClickEditHandler = (info) => {
+    setSelectedForEdit(sid => ({...info,subjects: info?.subjects?.map(s => s.id) }));
+    setOpen(true);
+  }
+
+  const onClickDeleteHandler = (info) => {
+    setSelectedForDelete(i => ({...info, __typename: 'SubjectFromStudent',selectedSubject}));
+    setOpenConfirmation(true);
+  }
+
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
-
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelecteds = rows.map((n) => n.name);
@@ -107,9 +155,6 @@ export default function SingleSubjectTable() {
     setPage(0);
   };
 
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
@@ -118,7 +163,7 @@ export default function SingleSubjectTable() {
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <SingleSubjectTableToolbar numSelected={selected.length} />
+        <SingleSubjectTableToolbar selectedSubject={selectedSubject} numSelected={selected.length} />
         <TableContainer>
           <Table
             className={classes.table}
@@ -139,7 +184,7 @@ export default function SingleSubjectTable() {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
+                  const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
@@ -148,12 +193,12 @@ export default function SingleSubjectTable() {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
+                      key={row.id}
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
                         <Checkbox
-                          onClick={(event) => handleClick(event, row.name)}
+                          onClick={(event) => handleClick(event, row.id)}
                           checked={isItemSelected}
                           inputProps={{ 'aria-labelledby': labelId }}
                         />
@@ -162,10 +207,14 @@ export default function SingleSubjectTable() {
                         {row.name}
                       </TableCell>
                       <TableCell align="right">
-                        <IconButton color="primary" component="span">
+                        <IconButton 
+                        onClick={() => onClickEditHandler(row)}                         
+                        color="primary" component="span">
                           <EditIcon />
                         </IconButton>
-                        <IconButton color="secondary" component="span">
+                        <IconButton
+                          onClick={() => onClickDeleteHandler(row)}
+                        color="secondary" component="span">
                           <DeleteIcon />
                         </IconButton>
                         
@@ -191,6 +240,30 @@ export default function SingleSubjectTable() {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
+
+      <_Modal
+        open={open}
+        setOpen={setOpen}
+      >
+        <AddNewStudentForm
+          open={open}
+          setOpen={setOpen}
+          selectedForEdit={selectedForEdit}
+          setSelected={setSelectedForEdit}
+        />
+      </_Modal>
+
+      <_Modal
+        open={openConfirmation}
+        setOpen={setOpenConfirmation}
+      >
+        <ConfirmationForm
+          open={openConfirmation}
+          setOpen={setOpenConfirmation}
+          selectedForDelete={selectedForDelete}
+        />
+      </_Modal>
     </div>
   );
 }
+

@@ -1,5 +1,6 @@
 import Subject from '../../models/Subject';
 import {errorNames} from '../../constants/errors'
+import Student from '../../models/Student';
 
 
 module.exports = {
@@ -31,7 +32,6 @@ module.exports = {
     async updateSubject(parent, args, context, req){
         const {id:_id, title} = args;
         
-        console.log("MUTATION UPDATE^^^^^=====================", args);
 
         try {
             const updatedSubject = await Subject.findOneAndUpdate({_id},{title},{new:true});
@@ -48,6 +48,12 @@ module.exports = {
         const {id:_id} = args;
 
         try {
+
+            await Student.updateMany(
+                {"subjects":{$in:[_id]}},
+                {"$pull":{"subjects":{$in:[_id]}}
+            })
+
             await Subject.findOneAndDelete({_id});
 
             return {
@@ -59,6 +65,34 @@ module.exports = {
             }
         } catch (error) {
             throw new Error(error.message);
+        }
+    },
+
+    async deleteMultipleSubject(parent, args, context, req) {
+        const {id:idList} = args;
+
+
+        try {
+            await Student.updateMany(
+                {"subjects":{$in:[...idList]}},
+                {"$pull":{
+                    "subjects": {$in: [...idList]}
+                }}
+            )
+            
+            await Subject.remove({
+                _id: {$in: [...idList]}
+            });
+    
+            return {
+                id: idList,
+                msg: {
+                    message: "Selected subjects deleted successfully",
+                    success: true
+                }
+            }
+        } catch (error) {
+            throw new Error(error.message)
         }
     }
 }

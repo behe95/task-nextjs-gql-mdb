@@ -1,5 +1,5 @@
-import {createStudent,updateStudent,deleteStudent,deleteSubjectsFromStudent} from './mutation/Student';
-import {createSubject,updateSubject,deleteSubject} from './mutation/Subject';
+import {createStudent,updateStudent,deleteStudent,deleteSubjectsFromStudent,deleteMultipleStudent} from './mutation/Student';
+import {createSubject,updateSubject,deleteSubject,deleteMultipleSubject} from './mutation/Subject';
 
 module.exports = {
     Mutation: {
@@ -7,9 +7,11 @@ module.exports = {
         updateStudent,
         deleteStudent,
         deleteSubjectsFromStudent,
+        deleteMultipleStudent,
 
         createSubject,
         updateSubject,
-        deleteSubject
+        deleteSubject,
+        deleteMultipleSubject
     }
 }

@@ -14,10 +14,11 @@ module.exports = {
     },
 
     async getAllStudentsBySubject(parent, {subjectId}, context, req){
+        console.log(">>>>>>>>>>>>>>>>>>>>>>>",subjectId);
         try {
             const students = await Student.find({
                 subjects: {"$in": [subjectId]}
-            });
+            }).populate('subjects');
 
             return students;
 
